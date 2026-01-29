@@ -11,13 +11,18 @@ function verifySignature(req) { const sig =
   `sha256=${hmac.digest("hex")}`; return crypto.timingSafeEqual(
     Buffer.from(sig), Buffer.from(digest) );
 }
-app.post("/webhook", (req, res) => { if (!verifySignature(req)) { 
-    console.log("❌ Invalid signature"); return 
+const { exec } = require("child_process"); 
+app.post("/webhook", (req, res) => {
+  if (!verifySignature(req)) { console.log("❌ Invalid 
+    signature"); return 
     res.status(401).send("Unauthorized");
   }
-  console.log("🔥 GitHub event:", req.headers["x-github-event"]); 
+  console.log("🔥 GitHub push received"); 
+  exec("../scripts/on-push.sh", (err, stdout, stderr) => 
+  {
+    if (err) console.error(err); if (stdout) 
+    console.log(stdout); if (stderr) 
+    console.error(stderr);
+  });
   res.sendStatus(200);
-});
-app.listen(PORT, () => { console.log(`🚀 Smart-IDE webhook running on 
-  ${PORT}`);
 });
