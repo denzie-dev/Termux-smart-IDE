@@ -9,6 +9,11 @@ app.get("/", (req, res) => {
 });
 
 app.post("/webhook", (req, res) => {
+  const analyze = require("./analyzer");
+
+analyze("../").then(result => {
+  console.log("Analysis result:", result);
+});
   console.log("GitHub webhook received");
   res.sendStatus(200);
 });
